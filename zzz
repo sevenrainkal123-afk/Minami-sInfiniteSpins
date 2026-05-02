@@ -1,0 +1,179 @@
+-- Create ScreenGui
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "MyLoadstringUI"
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Create Frame with rounded corners (20% bigger than smaller version)
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 210, 0, 252)  -- 20% larger than 175x210
+Frame.Position = UDim2.new(0.5, -105, 0.5, -126)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.BorderSizePixel = 0
+Frame.Parent = ScreenGui
+
+-- Make the UI movable
+local dragging = false
+local dragInput, dragStart, startPos
+
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = Frame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+Frame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        local delta = input.Position - dragStart
+        Frame.Position = startPos + UDim2.new(0, delta.X, 0, delta.Y)
+    end
+end)
+
+-- Title Container with glow
+local TitleContainer = Instance.new("Frame")
+TitleContainer.Size = UDim2.new(1, 0, 0, 36)  -- 20% larger height
+TitleContainer.Position = UDim2.new(0, 0, 0, 0)
+TitleContainer.BackgroundTransparency = 1
+TitleContainer.Parent = Frame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(0.8, 0, 1, 0)
+Title.Position = UDim2.new(0.1, 0, 0, 0)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.fromRGB(255, 215, 0)
+Title.Text = "Minami's Infinite Spins 🚀"
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 16  -- Slightly larger text
+Title.Parent = TitleContainer
+
+-- Decorative border
+local Border = Instance.new("Frame")
+Border.Size = UDim2.new(1, 0, 1, 0)
+Border.Position = UDim2.new(0, 0, 0, 0)
+Border.BorderSizePixel = 2
+Border.BackgroundTransparency = 1
+Border.BorderColor3 = Color3.fromRGB(255, 255, 255)
+Border.Parent = Frame
+
+-- Background stripe for decoration
+local Stripe = Instance.new("Frame")
+Stripe.Size = UDim2.new(1, 0, 0, 5)  -- 20% thicker
+Stripe.Position = UDim2.new(0, 0, 0, 36)
+Stripe.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+Stripe.Parent = Frame
+
+-- Helper function for buttons
+local function createButton(text, yPosition)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 150, 0, 36)  -- 20% bigger
+    btn.Position = UDim2.new(0.5, -75, 0, yPosition)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.BorderSizePixel = 0
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 16  -- Larger text
+    btn.Text = text
+
+    -- Rounded corners
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 6)
+    corner.Parent = btn
+
+    -- Hover effect
+    btn.MouseEnter:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    end)
+    btn.MouseLeave:Connect(function()
+        btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    end)
+
+    return btn
+end
+
+-- Create Buttons
+local buttonYStart = 50
+local buttonSpacing = 50
+
+local YenButton = createButton("Yen OFF", buttonYStart)
+YenButton.Parent = Frame
+
+local luckySpinsButton = createButton("Lucky Spins OFF", buttonYStart + buttonSpacing)
+luckySpinsButton.Parent = Frame
+
+local luckyAbilityButton = createButton("Lucky Ability Spins OFF", buttonYStart + 2 * buttonSpacing)
+luckyAbilityButton.Parent = Frame
+
+-- Variables for toggles
+local yenOn = false
+local yenLoop = nil
+local luckySpinsOn = false
+local luckySpinsLoop = nil
+local luckyAbilitySpinsOn = false
+local luckyAbilityLoop = nil
+
+-- Button functions
+YenButton.MouseButton1Click:Connect(function()
+    yenOn = not yenOn
+    if yenOn then
+        YenButton.Text = "Yen ON"
+        yenLoop = coroutine.create(function()
+            while yenOn do
+                local args = {[1] = 2}
+                game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit"):WaitForChild("Services"):WaitForChild("SeasonService"):WaitForChild("RF"):WaitForChild("RequestRankedReward"):InvokeServer(unpack(args))
+                wait(3)
+            end
+        end)
+        coroutine.resume(yenLoop)
+    else
+        YenButton.Text = "Yen OFF"
+        yenOn = false
+    end
+end)
+
+luckySpinsButton.MouseButton1Click:Connect(function()
+    luckySpinsOn = not luckySpinsOn
+    if luckySpinsOn then
+        luckySpinsButton.Text = "Lucky Spins ON"
+        luckySpinsLoop = coroutine.create(function()
+            while luckySpinsOn do
+                local args = {[1] = 1}
+                game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit"):WaitForChild("Services"):WaitForChild("SeasonService"):WaitForChild("RF"):WaitForChild("RequestRankedReward"):InvokeServer(unpack(args))
+                wait(3)
+            end
+        end)
+        coroutine.resume(luckySpinsLoop)
+    else
+        luckySpinsButton.Text = "Lucky Spins OFF"
+        luckySpinsOn = false
+    end
+end)
+
+luckyAbilityButton.MouseButton1Click:Connect(function()
+    luckyAbilitySpinsOn = not luckyAbilitySpinsOn
+    if luckyAbilitySpinsOn then
+        luckyAbilityButton.Text = "Lucky Ability Spins ON"
+        luckyAbilityLoop = coroutine.create(function()
+            while luckyAbilitySpinsOn do
+                local args = {[1] = 4}
+                game:GetService("ReplicatedStorage"):WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit"):WaitForChild("Services"):WaitForChild("SeasonService"):WaitForChild("RF"):WaitForChild("RequestRankedReward"):InvokeServer(unpack(args))
+                wait(3)
+            end
+        end)
+        coroutine.resume(luckyAbilityLoop)
+    else
+        luckyAbilityButton.Text = "Lucky Ability Spins OFF"
+        luckyAbilitySpinsOn = false
+    end
+end)
